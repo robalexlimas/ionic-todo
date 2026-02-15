@@ -1,0 +1,28 @@
+.page {
+    --padding-top: 12px;
+}
+
+.composer {
+    padding: 12px;
+    display: grid;
+    gap: 12px;
+}
+
+.title {
+    font-weight: 600;
+}
+
+.title.done {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.meta {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 4px;
+}
+
+.empty {
+    opacity: 0.7;
+}
