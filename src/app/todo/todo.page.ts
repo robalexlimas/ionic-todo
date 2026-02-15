@@ -1,6 +1,7 @@
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import {
   IonButton,
   IonButtons,
@@ -29,6 +30,8 @@ import { firstZodErrorMessage } from '../shared/validators/zod-errors';
 import { Category } from '../shared/models/category.model';
 
 addIcons({ trashOutline });
+
+type CategoryFilter = string | null | '__none__';
 
 @Component({
   selector: 'todo-page',
@@ -61,13 +64,28 @@ addIcons({ trashOutline });
 export class TodoPage {
   todosRepo = inject(TodosRepository);
   private categoriesRepo = inject(CategoriesRepository);
+
   private toastCtrl = inject(ToastController);
 
   todos$ = this.todosRepo.todos$;
   categories$ = this.categoriesRepo.categories$;
 
   title = '';
-  selectedCategoryId: string = '';
+  selectedCategoryId: string | null = null;
+
+  private filterCategoryId$ = new BehaviorSubject<CategoryFilter>(null);
+
+  filteredTodos$ = combineLatest([this.todos$, this.filterCategoryId$]).pipe(
+    map(([todos, filter]) => {
+      if (filter === null) return todos;
+      if (filter === '__none__') return todos.filter((t) => !t.categoryId);
+      return todos.filter((t) => t.categoryId === filter);
+    })
+  );
+
+  setFilter(value: CategoryFilter): void {
+    this.filterCategoryId$.next(value);
+  }
 
   async addTodo(): Promise<void> {
     const parsed = todoCreateSchema.safeParse({
@@ -88,7 +106,7 @@ export class TodoPage {
     try {
       await this.todosRepo.create(parsed.data);
       this.title = '';
-      this.selectedCategoryId = '';
+      this.selectedCategoryId = null;
     } catch (e: any) {
       const toast = await this.toastCtrl.create({
         message: e?.message ?? 'No se pudo crear la tarea',

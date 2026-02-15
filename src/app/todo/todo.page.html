@@ -12,9 +12,9 @@
     </ion-item>
 
     <ion-item lines="full">
-      <ion-label position="stacked">Categoría</ion-label>
+      <ion-label position="stacked">Categoría (opcional)</ion-label>
       <ion-select [(ngModel)]="selectedCategoryId" interface="popover" placeholder="Sin categoría">
-        <ion-select-option [value]="">Sin categoría</ion-select-option>
+        <ion-select-option [value]="null">Sin categoría</ion-select-option>
         <ion-select-option *ngFor="let c of (categories$ | async) ?? []; trackBy: trackById" [value]="c.id">
           {{ c.name }}
         </ion-select-option>
@@ -25,9 +25,23 @@
     <ion-button expand="block" (click)="addTodo()">Agregar</ion-button>
   </div>
 
+  <!-- Filtro -->
+  <div class="filter">
+    <ion-item lines="full">
+      <ion-label position="stacked">Filtrar</ion-label>
+      <ion-select interface="popover" placeholder="Todas" (ionChange)="setFilter($event.detail.value)">
+        <ion-select-option [value]="null">Todas</ion-select-option>
+        <ion-select-option *ngFor="let c of (categories$ | async) ?? []; trackBy: trackById" [value]="c.id">
+          {{ c.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </div>
+
+  <!-- Lista -->
   <ion-list>
     <ng-container *ngIf="(categories$ | async) as cats; else catsEmpty">
-      <ion-item *ngFor="let t of (todos$ | async) ?? []; trackBy: trackById" lines="full">
+      <ion-item *ngFor="let t of (filteredTodos$ | async) ?? []; trackBy: trackById" lines="full">
         <ion-checkbox slot="start" [checked]="t.completed" (ionChange)="todosRepo.toggleCompleted(t.id)"></ion-checkbox>
 
         <ion-label>
@@ -42,14 +56,13 @@
         </ion-buttons>
       </ion-item>
 
-      <ion-item *ngIf="((todos$ | async) ?? []).length === 0" lines="none">
-        <ion-label class="empty">No hay tareas. Crea la primera arriba 👆</ion-label>
+      <ion-item *ngIf="((filteredTodos$ | async) ?? []).length === 0" lines="none">
+        <ion-label class="empty">No hay tareas para este filtro.</ion-label>
       </ion-item>
     </ng-container>
 
     <ng-template #catsEmpty>
-      <!-- Igual renderiza todos aunque no haya categorías -->
-      <ion-item *ngFor="let t of (todos$ | async) ?? []; trackBy: trackById" lines="full">
+      <ion-item *ngFor="let t of (filteredTodos$ | async) ?? []; trackBy: trackById" lines="full">
         <ion-checkbox slot="start" [checked]="t.completed" (ionChange)="todosRepo.toggleCompleted(t.id)"></ion-checkbox>
 
         <ion-label>
@@ -64,8 +77,8 @@
         </ion-buttons>
       </ion-item>
 
-      <ion-item *ngIf="((todos$ | async) ?? []).length === 0" lines="none">
-        <ion-label class="empty">No hay tareas. Crea la primera arriba 👆</ion-label>
+      <ion-item *ngIf="((filteredTodos$ | async) ?? []).length === 0" lines="none">
+        <ion-label class="empty">No hay tareas para este filtro.</ion-label>
       </ion-item>
     </ng-template>
   </ion-list>
