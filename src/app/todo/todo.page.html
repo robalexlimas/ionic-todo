@@ -11,8 +11,8 @@
       <ion-input [(ngModel)]="title" placeholder="Ej: Comprar leche"></ion-input>
     </ion-item>
 
-    <ion-item lines="full">
-      <ion-label position="stacked">Categoría (opcional)</ion-label>
+    <ion-item lines="full" *ngIf="ffCategories$ | async">
+      <ion-label position="stacked">Categoría</ion-label>
       <ion-select [(ngModel)]="selectedCategoryId" interface="popover" placeholder="Sin categoría">
         <ion-select-option [value]="null">Sin categoría</ion-select-option>
         <ion-select-option *ngFor="let c of (categories$ | async) ?? []; trackBy: trackById" [value]="c.id">
@@ -25,9 +25,8 @@
     <ion-button expand="block" (click)="addTodo()">Agregar</ion-button>
   </div>
 
-  <!-- Filtro -->
   <div class="filter">
-    <ion-item lines="full">
+    <ion-item lines="full" *ngIf="ffCategories$ | async">
       <ion-label position="stacked">Filtrar</ion-label>
       <ion-select interface="popover" placeholder="Todas" (ionChange)="setFilter($event.detail.value)">
         <ion-select-option [value]="null">Todas</ion-select-option>
@@ -38,7 +37,6 @@
     </ion-item>
   </div>
 
-  <!-- Lista -->
   <ion-list>
     <ng-container *ngIf="(categories$ | async) as cats; else catsEmpty">
       <ion-item *ngFor="let t of (filteredTodos$ | async) ?? []; trackBy: trackById" lines="full">

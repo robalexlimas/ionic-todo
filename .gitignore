@@ -9,6 +9,9 @@
 UserInterfaceState.xcuserstate
 $RECYCLE.BIN/
 
+**.env
+!.env.example
+
 *.log
 log.txt
 

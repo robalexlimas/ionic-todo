@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { categoriesFlagGuard } from '../core/guards/categories-flag.guard';
 
 export const routes: Routes = [
   {
@@ -13,6 +14,7 @@ export const routes: Routes = [
       },
       {
         path: 'categories',
+        canMatch: [categoriesFlagGuard],
         loadComponent: () =>
           import('../categories/categories.page').then((m) => m.CategoriesPage),
       },

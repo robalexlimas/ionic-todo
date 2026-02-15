@@ -23,6 +23,7 @@ import { ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { trashOutline } from 'ionicons/icons';
 
+import { RemoteConfigService } from '../core/firebase/remote-config.service';
 import { TodosRepository } from '../features/todos/todos.repository';
 import { CategoriesRepository } from '../features/categories/categories.repository';
 import { todoCreateSchema } from '../shared/validators/schemas';
@@ -75,6 +76,10 @@ export class TodoPage {
 
   private filterCategoryId$ = new BehaviorSubject<CategoryFilter>(null);
 
+  private rc = inject(RemoteConfigService);
+  ffCategories$ = this.rc.flags$.pipe(map(f => f.ff_categories));
+  ffCategories = true;
+
   filteredTodos$ = combineLatest([this.todos$, this.filterCategoryId$]).pipe(
     map(([todos, filter]) => {
       if (filter === null) return todos;
@@ -83,6 +88,10 @@ export class TodoPage {
     })
   );
 
+  constructor() {
+    this.ffCategories$.subscribe((v) => (this.ffCategories = v));
+  }
+
   setFilter(value: CategoryFilter): void {
     this.filterCategoryId$.next(value);
   }
@@ -90,7 +99,7 @@ export class TodoPage {
   async addTodo(): Promise<void> {
     const parsed = todoCreateSchema.safeParse({
       title: this.title,
-      categoryId: this.selectedCategoryId,
+      categoryId: this.ffCategories ? this.selectedCategoryId : '',
     });
 
     if (!parsed.success) {

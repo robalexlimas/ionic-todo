@@ -5,7 +5,7 @@
       <ion-label>To-Dos</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="categories" aria-label="categories">
+    <ion-tab-button tab="categories" aria-label="categories" *ngIf="ffCategories$ | async">
       <ion-icon name="folder-outline"></ion-icon>
       <ion-label>Categorías</ion-label>
     </ion-tab-button>
