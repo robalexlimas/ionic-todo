@@ -19,11 +19,6 @@ export const routes: Routes = [
           import('../categories/categories.page').then((m) => m.CategoriesPage),
       },
       {
-        path: 'settings',
-        loadComponent: () =>
-          import('../settings/settings.page').then((m) => m.SettingsPage),
-      },
-      {
         path: '',
         redirectTo: '/todo-list',
         pathMatch: 'full',
