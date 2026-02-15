@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import {
   IonButton,
   IonButtons,
-  IonCheckbox,
   IonContent,
   IonHeader,
   IonIcon,
@@ -12,9 +11,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonNote,
-  IonSelect,
-  IonSelectOption,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
@@ -22,18 +18,17 @@ import { ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { trashOutline } from 'ionicons/icons';
 
-import { TodosRepository } from '../features/todos/todos.repository';
 import { CategoriesRepository } from '../features/categories/categories.repository';
-import { todoCreateSchema } from '../shared/validators/schemas';
+import { categoryCreateSchema } from '../shared/validators/schemas';
 import { firstZodErrorMessage } from '../shared/validators/zod-errors';
-import { Category } from '../shared/models/category.model';
+import { TodosRepository } from '../features/todos/todos.repository';
 
 addIcons({ trashOutline });
 
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss'],
+  selector: 'categories-page',
+  templateUrl: 'categories.page.html',
+  styleUrls: ['categories.page.scss'],
   standalone: true,
   imports: [
     NgIf,
@@ -50,30 +45,20 @@ addIcons({ trashOutline });
     IonButton,
     IonButtons,
     IonList,
-    IonCheckbox,
     IonIcon,
-    IonSelect,
-    IonSelectOption,
-    IonNote,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Tab1Page {
-  todosRepo = inject(TodosRepository); // lo usamos en template
+export class CategoriesPage {
   private categoriesRepo = inject(CategoriesRepository);
+  private todosRepo = inject(TodosRepository);
   private toastCtrl = inject(ToastController);
 
-  todos$ = this.todosRepo.todos$;
   categories$ = this.categoriesRepo.categories$;
+  name = '';
 
-  title = '';
-  selectedCategoryId: string = '';
-
-  async addTodo(): Promise<void> {
-    const parsed = todoCreateSchema.safeParse({
-      title: this.title,
-      categoryId: this.selectedCategoryId,
-    });
+  async addCategory(): Promise<void> {
+    const parsed = categoryCreateSchema.safeParse({ name: this.name });
 
     if (!parsed.success) {
       const toast = await this.toastCtrl.create({
@@ -86,12 +71,11 @@ export class Tab1Page {
     }
 
     try {
-      await this.todosRepo.create(parsed.data);
-      this.title = '';
-      this.selectedCategoryId = '';
+      await this.categoriesRepo.create(parsed.data);
+      this.name = '';
     } catch (e: any) {
       const toast = await this.toastCtrl.create({
-        message: e?.message ?? 'No se pudo crear la tarea',
+        message: e?.message ?? 'No se pudo crear la categoría',
         duration: 1800,
         position: 'bottom',
       });
@@ -99,13 +83,22 @@ export class Tab1Page {
     }
   }
 
-  trackById(_: number, item: { id: string }): string {
-    return item.id;
+  async removeCategory(id: string): Promise<void> {
+    try {
+      await this.categoriesRepo.remove(id);
+      await this.todosRepo.clearCategory(id);
+    } catch (e: any) {
+      const toast = await this.toastCtrl.create({
+        message: e?.message ?? 'No se pudo eliminar la categoría',
+        duration: 1800,
+        position: 'bottom',
+      });
+      await toast.present();
+    }
+
   }
 
-  categoryNameById(categories: Category[], id: string | null | undefined): string {
-    if (!id) return 'Sin categoría';
-    const found = categories.find((c) => c.id === id);
-    return found?.name ?? 'Sin categoría';
+  trackById(_: number, item: { id: string }): string {
+    return item.id;
   }
 }
