@@ -1,7 +1,7 @@
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, shareReplay } from 'rxjs';
 import {
   IonButton,
   IonButtons,
@@ -88,6 +88,16 @@ export class TodoPage {
     })
   );
 
+  categoriesById$ = this.categories$.pipe(
+    map((cats) => new Map(cats.map((c) => [c.id, c.name]))),
+    shareReplay(1)
+  );
+
+  categoryNameFromMap(mapper: Map<string, string>, id: string | null | undefined): string {
+    if (!id) return 'Sin categoría';
+    return mapper.get(id) ?? 'Sin categoría';
+  }
+
   constructor() {
     this.ffCategories$.subscribe((v) => (this.ffCategories = v));
   }
@@ -128,11 +138,5 @@ export class TodoPage {
 
   trackById(_: number, item: { id: string }): string {
     return item.id;
-  }
-
-  categoryNameById(categories: Category[], id: string | null | undefined): string {
-    if (!id) return 'Sin categoría';
-    const found = categories.find((c) => c.id === id);
-    return found?.name ?? 'Sin categoría';
   }
 }

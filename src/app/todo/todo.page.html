@@ -38,13 +38,13 @@
   </div>
 
   <ion-list>
-    <ng-container *ngIf="(categories$ | async) as cats; else catsEmpty">
+    <ng-container *ngIf="(categoriesById$ | async) as catMap; else catsEmpty">
       <ion-item *ngFor="let t of (filteredTodos$ | async) ?? []; trackBy: trackById" lines="full">
         <ion-checkbox slot="start" [checked]="t.completed" (ionChange)="todosRepo.toggleCompleted(t.id)"></ion-checkbox>
 
         <ion-label>
           <div class="title" [class.done]="t.completed">{{ t.title }}</div>
-          <div class="meta">{{ categoryNameById(cats, t.categoryId) }}</div>
+          <div class="meta">{{ categoryNameFromMap(catMap, t.categoryId) }}</div>
         </ion-label>
 
         <ion-buttons slot="end">
