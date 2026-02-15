@@ -52,6 +52,14 @@ export class CategoriesRepository {
         const parsed = categoryUpdateSchema.parse(input);
         const now = Date.now();
 
+        if (parsed.name) {
+            const nameLower = parsed.name.toLowerCase();
+            const exists = this.snapshot.some(
+                (c) => c.id !== id && c.name.toLowerCase() === nameLower
+            );
+            if (exists) throw new Error('Ya existe una categoría con ese nombre');
+        }
+
         const next = this.snapshot.map((c) =>
             c.id === id
                 ? {

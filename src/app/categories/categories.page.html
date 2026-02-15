@@ -16,14 +16,24 @@
 
   <ion-list>
     <ion-item *ngFor="let c of (categories$ | async) ?? []; trackBy: trackById" lines="full">
-      <ion-label>
+      <ion-label *ngIf="editingId !== c.id; else editTpl">
         <div class="name">{{ c.name }}</div>
       </ion-label>
 
-      <ion-buttons slot="end">
+      <ng-template #editTpl>
+        <ion-input [(ngModel)]="editName" placeholder="Nombre categoría"></ion-input>
+      </ng-template>
+
+      <ion-buttons slot="end" *ngIf="editingId !== c.id">
+        <ion-button fill="clear" (click)="startEdit(c.id, c.name)">Editar</ion-button>
         <ion-button fill="clear" (click)="removeCategory(c.id)">
           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
         </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="editingId === c.id">
+        <ion-button fill="clear" (click)="saveEdit(c.id)">Guardar</ion-button>
+        <ion-button fill="clear" (click)="cancelEdit()">Cancelar</ion-button>
       </ion-buttons>
     </ion-item>
 
