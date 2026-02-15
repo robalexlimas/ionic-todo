@@ -25,6 +25,13 @@ export class CategoriesRepository {
 
     async create(input: { name: string; color?: string }): Promise<Category> {
         const parsed = categoryCreateSchema.parse(input);
+
+        const nameLower = parsed.name.toLowerCase();
+        const exists = this.snapshot.some((c) => c.name.toLowerCase() === nameLower);
+        if (exists) {
+            throw new Error('Ya existe una categoría con ese nombre');
+        }
+
         const now = Date.now();
 
         const category: Category = {

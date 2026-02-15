@@ -27,6 +27,15 @@ export class TodosRepository {
 
     async create(input: { title: string; categoryId?: string | null }): Promise<Todo> {
         const parsed = todoCreateSchema.parse(input);
+
+        const titleLower = parsed.title.toLowerCase();
+        const exists = this.snapshot.some(
+            (t) =>
+                t.title.toLowerCase() === titleLower &&
+                (t.categoryId ?? null) === (parsed.categoryId ?? null)
+        );
+        if (exists) throw new Error('Ya existe una tarea igual en esa categoría');
+
         const now = Date.now();
 
         const todo: Todo = {
