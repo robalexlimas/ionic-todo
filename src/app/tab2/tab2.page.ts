@@ -70,13 +70,32 @@ export class Tab2Page {
       return;
     }
 
-    await this.categoriesRepo.create(parsed.data);
-    this.name = '';
+    try {
+      await this.categoriesRepo.create(parsed.data);
+      this.name = '';
+    } catch (e: any) {
+      const toast = await this.toastCtrl.create({
+        message: e?.message ?? 'No se pudo crear la categoría',
+        duration: 1800,
+        position: 'bottom',
+      });
+      await toast.present();
+    }
   }
 
   async removeCategory(id: string): Promise<void> {
-    await this.categoriesRepo.remove(id);
-    await this.todosRepo.clearCategory(id); // integridad: tasks sin categoría
+    try {
+      await this.categoriesRepo.remove(id);
+      await this.todosRepo.clearCategory(id);
+    } catch (e: any) {
+      const toast = await this.toastCtrl.create({
+        message: e?.message ?? 'No se pudo eliminar la categoría',
+        duration: 1800,
+        position: 'bottom',
+      });
+      await toast.present();
+    }
+
   }
 
   trackById(_: number, item: { id: string }): string {

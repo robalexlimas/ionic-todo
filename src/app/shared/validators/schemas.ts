@@ -8,7 +8,11 @@ export const todoCreateSchema = z.object({
         .transform(normalize)
         .refine((v) => v.length > 0, 'El título es obligatorio')
         .refine((v) => v.length <= 80, 'Máximo 80 caracteres'),
-    categoryId: z.string().trim().nullable().optional(),
+    categoryId: z
+        .string()
+        .transform(normalize)
+        .refine((v) => v.length > 0, 'La categoria es obligatoria')
+        .refine((v) => v.length <= 80, 'Máximo 80 caracteres'),
 });
 
 export const todoUpdateSchema = z.object({

@@ -12,9 +12,9 @@
     </ion-item>
 
     <ion-item lines="full">
-      <ion-label position="stacked">Categoría (opcional)</ion-label>
+      <ion-label position="stacked">Categoría</ion-label>
       <ion-select [(ngModel)]="selectedCategoryId" interface="popover" placeholder="Sin categoría">
-        <ion-select-option [value]="null">Sin categoría</ion-select-option>
+        <ion-select-option [value]="">Sin categoría</ion-select-option>
         <ion-select-option *ngFor="let c of (categories$ | async) ?? []; trackBy: trackById" [value]="c.id">
           {{ c.name }}
         </ion-select-option>
@@ -37,7 +37,7 @@
 
         <ion-buttons slot="end">
           <ion-button fill="clear" (click)="todosRepo.remove(t.id)">
-            <ion-icon slot="icon-only" name="trashOutline"></ion-icon>
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-item>
@@ -59,7 +59,7 @@
 
         <ion-buttons slot="end">
           <ion-button fill="clear" (click)="todosRepo.remove(t.id)">
-            <ion-icon slot="icon-only" name="trashOutline"></ion-icon>
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-item>

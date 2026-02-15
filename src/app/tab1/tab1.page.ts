@@ -67,7 +67,7 @@ export class Tab1Page {
   categories$ = this.categoriesRepo.categories$;
 
   title = '';
-  selectedCategoryId: string | null = null;
+  selectedCategoryId: string = '';
 
   async addTodo(): Promise<void> {
     const parsed = todoCreateSchema.safeParse({
@@ -85,9 +85,18 @@ export class Tab1Page {
       return;
     }
 
-    await this.todosRepo.create(parsed.data);
-    this.title = '';
-    this.selectedCategoryId = null;
+    try {
+      await this.todosRepo.create(parsed.data);
+      this.title = '';
+      this.selectedCategoryId = '';
+    } catch (e: any) {
+      const toast = await this.toastCtrl.create({
+        message: e?.message ?? 'No se pudo crear la tarea',
+        duration: 1800,
+        position: 'bottom',
+      });
+      await toast.present();
+    }
   }
 
   trackById(_: number, item: { id: string }): string {
